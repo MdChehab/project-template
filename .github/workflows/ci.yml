@@ -1,0 +1,46 @@
+# Runs lint + tests on every push and PR.
+# Each block only runs if the project has that kind of setup, so this file works for Python, Node, or both.
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---------- Python ----------
+      - name: Set up Python
+        if: hashFiles('requirements.txt', 'pyproject.toml') != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python deps
+        if: hashFiles('requirements.txt', 'pyproject.toml') != ''
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install -e ".[dev]"; fi
+          pip install pytest ruff
+      - name: Lint (ruff)
+        if: hashFiles('requirements.txt', 'pyproject.toml') != ''
+        run: ruff check .
+      - name: Test (pytest)
+        if: hashFiles('requirements.txt', 'pyproject.toml') != ''
+        run: pytest -q
+
+      # ---------- Node ----------
+      - name: Set up Node
+        if: hashFiles('package.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Node deps
+        if: hashFiles('package.json') != ''
+        run: npm ci
+      - name: Lint + test
+        if: hashFiles('package.json') != ''
+        run: |
+          npm run lint --if-present
+          npm test --if-present

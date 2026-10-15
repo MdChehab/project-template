@@ -1,0 +1,24 @@
+# secrets
+.env
+*.pem
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.coverage
+# node
+node_modules/
+dist/
+build/
+.next/
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+# data (commit samples only)
+data/raw/
+*.sqlite
+*.db
